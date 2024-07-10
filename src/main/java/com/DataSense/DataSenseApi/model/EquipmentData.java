@@ -20,8 +20,7 @@ public class EquipmentData {
 	public EquipmentData() {
 	    }
 		
-	public EquipmentData(long id, String equipmentId, OffsetDateTime timestamp, double value) {
-		this.id = id;
+	public EquipmentData(String equipmentId, OffsetDateTime timestamp, double value) {
 		this.equipmentId = equipmentId;
 		this.timestamp = timestamp;
 		this.value = value;

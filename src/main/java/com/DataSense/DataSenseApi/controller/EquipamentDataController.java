@@ -1,6 +1,13 @@
 package com.DataSense.DataSenseApi.controller;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.DataSense.DataSenseApi.model.EquipmentData;
 import com.DataSense.DataSenseApi.repository.EquipamentDataRepository;
@@ -20,27 +29,69 @@ import com.DataSense.DataSenseApi.repository.EquipamentDataRepository;
 public class EquipamentDataController {
 
 	@Autowired
-    private EquipamentDataRepository equipamentDataRepository;
-	
-	@GetMapping
-    public List<EquipmentData> getAllEquipmentData() {
-        return equipamentDataRepository.findAll();
-    }
-	
-	@GetMapping("/{id}")
-    public ResponseEntity<?> getEquipmentDataById(@PathVariable Long id) {
-		
-        EquipmentData equipmentData = equipamentDataRepository.findById(id).orElse(null);
-        
-        if (equipmentData != null) {
-            return ResponseEntity.ok(equipmentData);
-        } else {
-        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Equipment with id " + id + " was not found");
-        }
-    }
+	private EquipamentDataRepository equipamentDataRepository;
 
-    @PostMapping
+	@GetMapping
+	public List<EquipmentData> getAllEquipmentData() {
+		return equipamentDataRepository.findAll();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getEquipmentDataById(@PathVariable Long id) {
+
+		EquipmentData equipmentData = equipamentDataRepository.findById(id).orElse(null);
+
+		if (equipmentData != null) {
+			return ResponseEntity.ok(equipmentData);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Equipment with id " + id + " was not found");
+		}
+	}
+
+	@PostMapping
     public EquipmentData receiveEquipamentData(@RequestBody EquipmentData equipmentData) {
         return equipamentDataRepository.save(equipmentData);
     }
+
+	@PostMapping("/upload")
+	public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
+		if (file.isEmpty()) {
+			return new ResponseEntity<>("The file is empty", HttpStatus.BAD_REQUEST);
+		}
+
+		try (InputStream inputStream = file.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+			String line;
+			List<EquipmentData> equipmentDataList = new ArrayList<>();
+			DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+
+			reader.readLine();
+
+			while ((line = reader.readLine()) != null) {
+				String[] values = line.split(",");
+				if (values.length == 3) {
+					String equipmentId = values[0].trim();
+					OffsetDateTime timestamp = OffsetDateTime.parse(values[1].trim(), formatter);
+					Double value = Double.parseDouble(values[2].trim());
+					
+					EquipmentData equipmentData = new EquipmentData();
+					equipmentData.setEquipmentId(equipmentId);
+					equipmentData.setTimestamp(timestamp);
+					equipmentData.setValue(value);
+
+					equipmentDataList.add(equipmentData);
+				}
+			}
+
+			equipamentDataRepository.saveAll(equipmentDataList);
+
+			return new ResponseEntity<>("CSV file was been processed", HttpStatus.OK);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>("Error in CSV file", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 }
