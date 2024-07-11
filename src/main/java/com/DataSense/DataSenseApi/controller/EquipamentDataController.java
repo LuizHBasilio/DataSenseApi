@@ -6,8 +6,9 @@ import java.io.InputStreamReader;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,39 @@ public class EquipamentDataController {
 			e.printStackTrace();
 			return new ResponseEntity<>("Error in CSV file", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
+
+	@GetMapping("/average")
+    public Map<String, Double> getAverageValues(
+            @RequestParam("period") String period,
+            @RequestParam("equipmentId") String equipmentId) {
+
+        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime startDate = now;
+
+        switch (period.toLowerCase()) {
+            case "24h":
+                startDate = now.minusHours(24);
+                break;
+            case "48h":
+                startDate = now.minusHours(48);
+                break;
+            case "1w":
+                startDate = now.minusWeeks(1);
+                break;
+            case "1m":
+                startDate = now.minusMonths(1);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid period: " + period);
+        }
+
+        List<EquipmentData> data = equipamentDataRepository.findAllByEquipmentIdAndTimestampBetween(equipmentId, startDate, now);
+        double average = data.stream().mapToDouble(EquipmentData::getValue).average().orElse(0.0);
+
+        Map<String, Double> result = new HashMap<>();
+        result.put("average", average);
+
+        return result;
+    }
 }
