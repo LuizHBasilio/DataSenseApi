@@ -125,13 +125,9 @@ Content-Type: application/json
 
 Request Body:
 
-```csv
-{
-  "title": "The Catcher in the Rye",
-  "author": "J. D. Salinger",
-  "publishedDate": "1951-07-16",
-  "genre": "Novel"
-}
+```form-data/file
+equipmentId,timestamp,value
+EQ-12425,2023-02-15T01:30:00.000-05:00,78.42
 ```
 
 Response

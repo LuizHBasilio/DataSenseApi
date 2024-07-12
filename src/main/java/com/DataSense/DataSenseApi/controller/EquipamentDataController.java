@@ -25,6 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.DataSense.DataSenseApi.model.EquipmentData;
 import com.DataSense.DataSenseApi.repository.EquipamentDataRepository;
 
+/**
+ * Equipment data controller.
+ */
 @RestController
 @RequestMapping("/datasense/api/v1/equipments")
 public class EquipamentDataController {
@@ -32,11 +35,22 @@ public class EquipamentDataController {
 	@Autowired
 	private EquipamentDataRepository equipamentDataRepository;
 
+    /**
+     * Get all equipment data entries.
+     *
+     * @return list of all equipment data
+     */
 	@GetMapping
 	public List<EquipmentData> getAllEquipmentData() {
 		return equipamentDataRepository.findAll();
 	}
 
+	/**
+     * Get a specific equipment data entry by ID.
+     *
+     * @param id the ID of the equipment data
+     * @return the equipment data entry or a 404 status if not found
+     */
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getEquipmentDataById(@PathVariable Long id) {
 
@@ -48,12 +62,24 @@ public class EquipamentDataController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Equipment with id " + id + " was not found");
 		}
 	}
-
+	
+	/**
+     * Receive and save a new equipment data entry.
+     *
+     * @param equipmentData the equipment data to save
+     * @return the saved equipment data
+     */
 	@PostMapping
     public EquipmentData receiveEquipamentData(@RequestBody EquipmentData equipmentData) {
         return equipamentDataRepository.save(equipmentData);
     }
 
+	/**
+     * Receive and process a CSV file containing equipment data.
+     *
+     * @param file the CSV file to process
+     * @return a response indicating success or failure
+     */
 	@PostMapping("/upload")
 	public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
 		if (file.isEmpty()) {
