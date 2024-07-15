@@ -15,16 +15,16 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
 import com.DataSense.DataSenseApi.model.EquipmentData;
-import com.DataSense.DataSenseApi.repository.EquipamentDataRepository;
+import com.DataSense.DataSenseApi.repository.EquipmentDataRepository;
 
 
 public class EquipamentDataControllerTest {
 
 	@Mock
-    private EquipamentDataRepository equipamentDataRepository;
+    private EquipmentDataRepository equipamentDataRepository;
 
     @InjectMocks
-    private EquipamentDataController equipamentDataController;
+    private EquipmentDataController equipamentDataController;
 	
     @BeforeEach
     public void setUp() {

@@ -23,17 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.DataSense.DataSenseApi.model.EquipmentData;
-import com.DataSense.DataSenseApi.repository.EquipamentDataRepository;
+import com.DataSense.DataSenseApi.repository.EquipmentDataRepository;
 
 /**
  * Equipment data controller.
  */
 @RestController
 @RequestMapping("/datasense/api/v1/equipments")
-public class EquipamentDataController {
+public class EquipmentDataController {
 
 	@Autowired
-	private EquipamentDataRepository equipamentDataRepository;
+	private EquipmentDataRepository equipamentDataRepository;
 
     /**
      * Get all equipment data entries.

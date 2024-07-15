@@ -11,7 +11,7 @@ import com.DataSense.DataSenseApi.model.EquipmentData;
 /**
  * Repository interface for EquipmentData entity.
  */
-public interface EquipamentDataRepository extends JpaRepository<EquipmentData, Long> {
+public interface EquipmentDataRepository extends JpaRepository<EquipmentData, Long> {
     /**
      * Search for an EquipmentData entry by its equipmentId.
      *
